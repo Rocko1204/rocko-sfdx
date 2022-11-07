@@ -1,7 +1,7 @@
 {
   "name": "@rocko1204/rocko-sfdx",
   "description": "Salesforce DX (SFDX) commands to support salesforce developments & deployments",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "author": "Ronny Rokitta",
   "bugs": "https://github.com/github/rocko-sfdx/issues",
   "dependencies": {
@@ -75,7 +75,7 @@
     "commands": "./lib/commands",
     "topics": {
       "rocko": {
-        "description": "CLI for Package Development",
+        "description": "Salesforce DX (SFDX) commands to support salesforce developments & deployments",
         "external": true,
         "subtopics": {
           "project": {
@@ -96,7 +96,7 @@
     "lint": "eslint src/**/*.ts test/**/*.ts",
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint src/**/*.ts test/**/*.ts",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest",
     "test": "nyc --extension .ts --require ts-node/register mocha --forbid-only \"test/**/*.test.ts\"",
     "version": "oclif-dev readme && git add README.md"
   }
