@@ -1,7 +1,7 @@
 {
   "name": "@rocko1204/rocko-sfdx",
   "description": "Salesforce DX (SFDX) commands to support salesforce developments & deployments",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Ronny Rokitta",
   "bugs": "https://github.com/github/rocko-sfdx/issues",
   "dependencies": {
@@ -15,8 +15,7 @@
     "chalk": "4.1.2",
     "cli-table3": "^0.6.2",
     "jsforce": "2.0.0-beta.19",
-    "simple-git": "^3.4.0",
-    "strip-ansi": ""
+    "simple-git": "^3.4.0"
   },
   "devDependencies": {
     "@oclif/plugin-command-snapshot": "^3.2.9",
