@@ -17,27 +17,20 @@ sfdx cli to build awesome package tool
 <!-- install -->
 <!-- usage -->
 ```sh-session
-$ npm install -g @rocko1204/rocko-sfdx
-$ @rocko1204/rocko-sfdx COMMAND
-running command...
-$ @rocko1204/rocko-sfdx (-v|--version|version)
-@rocko1204/rocko-sfdx/0.0.1 darwin-x64 node-v18.10.0
-$ @rocko1204/rocko-sfdx --help [COMMAND]
-USAGE
-  $ @rocko1204/rocko-sfdx COMMAND
+$ sfdx plugins:install @rocko1204/rocko-sfdx
 ...
 ```
 <!-- usagestop -->
 <!-- commands -->
-* [`@rocko1204/rocko-sfdx rocko:project:validate [-s <string>] [-v -t <string>] [-m] [-o] [-d] [-i <string>] [-e <string>] [-f] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#rocko1204rocko-sfdx-rockoprojectvalidate--s-string--v--t-string--m--o--d--i-string--e-string--f--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx rocko:project:validate [-s <string>] [-v -t <string>] [-m] [-o] [-d] [-i <string>] [-e <string>] [-f] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#rocko1204rocko-sfdx-rockoprojectvalidate--s-string--v--t-string--m--o--d--i-string--e-string--f--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
-## `@rocko1204/rocko-sfdx rocko:project:validate [-s <string>] [-v -t <string>] [-m] [-o] [-d] [-i <string>] [-e <string>] [-f] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx rocko:project:validate [-s <string>] [-v -t <string>] [-m] [-o] [-d] [-i <string>] [-e <string>] [-f] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 This command performs static checks in the sfdx-project json file for changed packages. Optional flags are used to control which validations are to be carried out. The individual tests are described with the flags.
 
 ```
 USAGE
-  $ @rocko1204/rocko-sfdx rocko:project:validate [-s <string>] [-v -t <string>] [-m] [-o] [-d] [-i <string>] [-e 
+  $ sfdx rocko:project:validate [-s <string>] [-v -t <string>] [-m] [-o] [-d] [-i <string>] [-e 
   <string>] [-f] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
   trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
@@ -106,12 +99,12 @@ To debug the `hello:org` command:
   
 If you linked your plugin to the sfdx cli, call your command with the `dev-suspend` switch: 
 ```sh-session
-$ sfdx hello:org -u myOrg@example.com --dev-suspend
+$ sfdx rocko:project:validate -u myOrg@example.com --dev-suspend
 ```
   
 Alternatively, to call your command using the `bin/run` script, set the `NODE_OPTIONS` environment variable to `--inspect-brk` when starting the debugger:
 ```sh-session
-$ NODE_OPTIONS=--inspect-brk bin/run hello:org -u myOrg@example.com
+$ NODE_OPTIONS=--inspect-brk bin/run rocko:project:validate -u myOrg@example.com
 ```
 
 2. Set some breakpoints in your command code

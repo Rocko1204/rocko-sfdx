@@ -1,7 +1,7 @@
 {
   "name": "@rocko1204/rocko-sfdx",
   "description": "Salesforce DX (SFDX) commands to support salesforce developments & deployments",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Ronny Rokitta",
   "bugs": "https://github.com/github/rocko-sfdx/issues",
   "dependencies": {
