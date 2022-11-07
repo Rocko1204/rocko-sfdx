@@ -640,8 +640,14 @@ The job cannot find the 'LATEST' prefix. Please check the version number ${sourc
             if (packageCheckList.filter(pckCheck => pckCheck.Package === pck.package)) {
                 Logger(`${COLOR_INFO_BOLD('Package')}: ${COLOR_INFO(pck.package)}`)
             }
+            //special output for wrong package tree order
+            if (packageCheckList.some(pckCheck => pckCheck.Package === pck.package && pckCheck.Process === ProjectCheckProcess.TREE_ORDER)) {
+                const pckOrderMainList = packageCheckList.filter(pckCheck => pckCheck.Package === pck.package && pckCheck.Process === ProjectCheckProcess.TREE_ORDER)
+                Logger(COLOR_ERROR_DIM(`Please put package ${pck.package} behind ⤵ the depend package ${pckOrderMainList[pckOrderMainList.length - 1].Message} ❗️`))
+            }
+            //standard output for errors without wrong package tree order
             packageCheckList.forEach((pckCheck) => {
-                if (pckCheck.Package === pck.package) {
+                if (pckCheck.Package === pck.package && pckCheck.Process !== ProjectCheckProcess.TREE_ORDER) {
                     Logger(COLOR_ERROR_DIM(`${pckCheck.Process}: ${pckCheck.Message}`));
                 }
             })
