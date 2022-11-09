@@ -1,7 +1,7 @@
 {
   "name": "@rocko1204/rocko-sfdx",
   "description": "Salesforce DX (SFDX) commands to support salesforce developments & deployments",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Ronny Rokitta",
   "bugs": "https://github.com/Rocko1204/rocko-sfdx/issues",
   "dependencies": {
@@ -89,7 +89,7 @@
       "@salesforce/plugin-command-reference"
     ]
   },
-  "repository": "github/rocko-sfdx",
+  "repository": "github/Rocko1204/rocko-sfdx",
   "scripts": {
     "build": "tsc -p .",
     "lint": "eslint src/**/*.ts test/**/*.ts",
