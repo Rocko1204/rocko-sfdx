@@ -10,11 +10,11 @@
   "order": "Checks if the dependent packages are arranged in the correct order in the package tree. Furthermore, it is checked that the dependend packages are arranged in front of the unlocked package in the tree. This check includes only unlocked packages.",
   "depsversion": "Checks whether the dependent packages have at least the versions of the dependent packages. Default this commands checks only the required versions. This check includes only unlocked packages.",
   "examples": [
-    "sfdx eon:project:validate -t origin/main --versionupdate",
-    "sfdx eon:project:validate --order --include core",
-    "sfdx eon:project:validate -t origin/main --versionupdate --missingdeps --order --depsversion",
-    "sfdx eon:project:validate -t origin/main - -v -m -o -d",
-    "sfdx eon:project:validate -t origin/main - -v -m -o -d -f",
-    "sfdx eon:project:validate -t origin/main --versionupdate --missingdeps --order --depsversion --fix"
+    "sfdx rocko:project:validate -t origin/main --versionupdate",
+    "sfdx rocko:project:validate --order --include core",
+    "sfdx rocko:project:validate -t origin/main --versionupdate --missingdeps --order --depsversion",
+    "sfdx rocko:project:validate -t origin/main - -v -m -o -d",
+    "sfdx rocko:project:validate -t origin/main - -v -m -o -d -f",
+    "sfdx rocko:project:validate -t origin/main --versionupdate --missingdeps --order --depsversion --fix"
   ]
 }
