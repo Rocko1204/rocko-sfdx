@@ -80,12 +80,12 @@ OPTIONS
       [default: warn] logging level for this command invocation
 
 EXAMPLES
-  sfdx eon:project:validate -t origin/main --versionupdate
-  sfdx eon:project:validate --order --include core
-  sfdx eon:project:validate -t origin/main --versionupdate --missingdeps --order --depsversion
-  sfdx eon:project:validate -t origin/main - -v -m -o -d
-  sfdx eon:project:validate -t origin/main - -v -m -o -d -f
-  sfdx eon:project:validate -t origin/main --versionupdate --missingdeps --order --depsversion --fix
+  sfdx rocko:project:validate -t origin/main --versionupdate
+  sfdx rocko:project:validate --order --include core
+  sfdx rocko:project:validate -t origin/main --versionupdate --missingdeps --order --depsversion
+  sfdx rocko:project:validate -t origin/main - -v -m -o -d
+  sfdx rocko:project:validate -t origin/main - -v -m -o -d -f
+  sfdx rocko:project:validate -t origin/main --versionupdate --missingdeps --order --depsversion --fix
 ```
 
 _See code: [src/commands/rocko/project/validate.ts](https://github.com/github/rocko-sfdx/blob/v0.0.1/src/commands/rocko/project/validate.ts)_

@@ -1,0 +1,12 @@
+{
+  "commandDescription": "This command validates a package from the project-json. The validation depends on whether it is an unlocked or source package. With unlocked packages, the dependencies are deployed first if they exist. Then the selected package is deployed and all test classes run only for the selected package. It is checked whether the package achieves a code coverage of 75%. In the case of source packages, a deployment is per checkonly. A sandbox should therefore be selected there. At the same time, all test classes are validated. A code coverage of 75% must be achieved for each test class.",
+  "deploymentscripts": "With this flag, the pre and postscripts are also executed if they exist in the project json.This flag is default set to false.",
+  "onlytests": "This flag only checks the code coverage for unlocked packages. That means there is no deployment and only the test classes are running. This flag is default set to false.",
+  "package": "Package name for which the validation should run. It's required",
+  "examples": [
+    "sfdx rocko:package:validate --package core",
+    "sfdx rocko:package:validate -package core --deploymentscripts --onlytests",
+    "sfdx rocko:package:validate -p core -d -o",
+    "sfdx rocko:package:validate -p core"
+  ]
+}
