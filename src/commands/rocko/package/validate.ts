@@ -85,8 +85,13 @@ export default class PackageCheck extends SfdxCommand {
         });
         Logger(packageTable.toString(),COLOR_INFO);
         Logger(`Is this a source or unlocked package? 🤔`, COLOR_TRACE);
+        for (const pck of packageTreeMap.keys()){
+            packageTable.push([COLOR_INFO(pck)]);
+        }
+        Logger(packageTable.toString(),COLOR_INFO);
         for (const [key, value] of packageTreeMap) {
-            if (!packageAliases[value.package]) {
+
+            if (packageAliases[value.package]) {
                 Logger(`Oh nice 👏. It's a unlocked package. Start validation`, COLOR_INFO);
                 Logger(`👆. Important. This package needs a code coverage 75 %`, COLOR_INFO);
                 Logger(`👆. Important. Please use a empty org to validate`, COLOR_INFO);
@@ -114,7 +119,7 @@ export default class PackageCheck extends SfdxCommand {
            const packageTree = new Map<string, PackageDirLargeWithDep>();
             for (const packageDir of packageDirList) {
                 if(this.flags.package === packageDir.package){
-                    packageTree.set(packageDir.path, packageDir);
+                    packageTree.set(packageDir.package, packageDir);
                 }
             }
             if(packageTree.size === 0){ throw new SfError(`Package ${this.flags.package} not found in sfdx-project.json`)}
@@ -129,21 +134,25 @@ export default class PackageCheck extends SfdxCommand {
 
         const packageSingleMap = new Map<string, UnlockedPackageInfo>();
         // get package
-        pckTree.dependency.forEach((dep) => {
-            if (dep.path && !packageDeployMap.get(dep.package)) {
-                packageDeployMap.set(dep.package, `Dependency`);
-                packageSingleMap.set(dep.package, {
-                    message: `Dependency`,
-                    path: dep.path,
-                    postDeploymentScript: dep.postDeploymentScript,
-                    preDeploymentScript: dep.preDeploymentScript,
-                });
-            }
-        });
+        //check if pck.Tree dep is empty
+        if(pckTree.dependencies?.length !== 0) {
+            pckTree.dependency.forEach((dep) => {
+                if (dep.path && !packageDeployMap.get(dep.package)) {
+                    packageDeployMap.set(dep.package, `Dependency`);
+                    packageSingleMap.set(dep.package, {
+                        message: `Dependency`,
+                        path: dep.path,
+                        postDeploymentScript: dep.postDeploymentScript,
+                        preDeploymentScript: dep.preDeploymentScript,
+                    });
+                }
+            });
+        }
         if (!packageDeployMap.get(pck)) {
             packageDeployMap.set(pck, `Package`);
             packageSingleMap.set(pck, {
                 message: `Package`,
+                path: pckTree.path,
                 postDeploymentScript: pckTree.postDeploymentScript,
                 preDeploymentScript: pckTree.preDeploymentScript,
             });
@@ -400,7 +409,7 @@ First the dependecies packages. And then this package.`
         let result: ApexTestclassCheck = { Id: '', isTest: false };
         try {
             const apexObj: ApexClass = await this.org.getConnection().singleRecordQuery(
-                `Select Id,Name,Body from ApexClass Where Name = '" + ${comp} + "' And ManageableState = 'unmanaged' LIMIT 1`,
+                `Select Id,Name,Body from ApexClass Where Name = '${comp}' And ManageableState = 'unmanaged' LIMIT 1`,
                 { tooling: true }
             );
             if (apexObj && (apexObj.Body.search('@isTest') > -1 || apexObj.Body.search('@IsTest') > -1)) {
