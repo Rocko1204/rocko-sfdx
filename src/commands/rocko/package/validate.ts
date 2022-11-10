@@ -48,18 +48,18 @@ export default class PackageCheck extends SfdxCommand {
         // Label For Named Credential as Required
         deploymentscripts: flags.boolean({
             char: 'd',
-            description: messages.getMessage('scriptFlag'),
+            description: messages.getMessage('deploymentscripts'),
             default: false,
             required: false,
         }),
         onlytests: flags.boolean({
             char: 'o',
-            description: messages.getMessage('testclassFlag'),
+            description: messages.getMessage('onlytests'),
             required: false,
         }),
         package: flags.string({
             char: 'p',
-            description: messages.getMessage('packageFlag'),
+            description: messages.getMessage('package'),
             default: '',
             required: true,
         }),
