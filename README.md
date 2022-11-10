@@ -14,7 +14,7 @@ how to install
 $ sfdx plugins:install @rocko1204/rocko-sfdx
 ...
 ```
-![](src/picture/project-validate.png)
+![](https://github.com/Rocko1204/rocko-sfdx/blob/main/src/picture/project-validate.png)
 
 This command performs static checks in the sfdx-project json file for changed packages. Optional flags are used to control which validations are to be carried out. The individual tests are described with the flags.
 See code: [src/commands/rocko/project/validate.ts](https://github.com/github/rocko-sfdx/blob/v0.0.1/src/commands/rocko/project/validate.ts)
@@ -77,7 +77,7 @@ EXAMPLES
   sfdx rocko:project:validate -t origin/main - -v -m -o -d -f
   sfdx rocko:project:validate -t origin/main --versionupdate --missingdeps --order --depsversion --fix
 ```
-![](src/picture/package-validate.png)
+![](https://github.com/Rocko1204/rocko-sfdx/blob/main/src/picture/package-validate.png)
 
 This command validates a package from the project-json. The validation depends on whether it is an unlocked or source package. So what make this command 🤔.
 
