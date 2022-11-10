@@ -89,7 +89,7 @@
       "@salesforce/plugin-command-reference"
     ]
   },
-  "repository": "github/rocko-sfdx",
+  "repository": "github/Rocko1204/rocko-sfdx",
   "scripts": {
     "build": "tsc -p .",
     "lint": "eslint src/**/*.ts test/**/*.ts",
