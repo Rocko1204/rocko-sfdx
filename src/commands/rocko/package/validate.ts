@@ -11,6 +11,7 @@ import {AnyJson} from '@salesforce/ts-types';
 import { ComponentSet, MetadataApiDeploy, MetadataResolver,DeployDetails } from '@salesforce/source-deploy-retrieve';
 import * as Table from 'cli-table3';
 import * as path from 'path';
+import * as fs from 'fs';
 import {LOGOBANNER} from '../../../utils';
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
@@ -26,7 +27,7 @@ import {
     COLOR_ERROR
 } from '../../../utils';
 import { QueryResult } from 'jsforce';
-import {PackageDirLarge, UnlockedPackageInfo, PackageDirLargeWithDep, CodeCoverageWarnings, DeployError, ApexTestQueueResult, ApexTestclassCheck} from "../../../interfaces/package";
+import {PackageDirLarge, UnlockedPackageInfo, PackageDirLargeWithDep, CodeCoverageWarnings, DeployError, ApexTestQueueResult, ApexTestclassCheck,SourcePackageComps} from "../../../interfaces/package";
 import {ApexClass, ApexTestQueueItem, ApexCodeCoverageAggregate, ApexTestResult} from "../../../interfaces/sobject";
 
 
@@ -108,10 +109,21 @@ export default class PackageCheck extends SfdxCommand {
                  Logger(`OMG only a source package 😒. Start validation`, COLOR_INFO);
                  Logger(`👆. Important. Any apex class needs a code coverage 75 %`, COLOR_INFO);
                  Logger(`👆. Important. Please use a sandbox org to validate`, COLOR_INFO);
-                 Logger(`⚠️⚠️⚠️👆. This check is in progress. Please wait for the next version update ⚠️⚠️⚠️`, COLOR_WARNING);
+
+                //execute preDeployment Scripts
+                if (value.preDeploymentScript && this.flags.deploymentscripts) {
+                    Logger(`☝ Found pre deployment script for package ${key}`,COLOR_INFO);
+                    await this.runDeploymentSteps(value.preDeploymentScript, 'preDeployment', key);
+                }
+                await this.validateSourcePackage(path.normalize(value.path), key);
+                //execute postDeployment Scripts
+                if (value.postDeploymentScript && this.flags.deploymentscripts) {
+                    Logger(`☝ Found post deployment script for package ${key}`,COLOR_INFO);
+                    await this.runDeploymentSteps(value.postDeploymentScript, 'postDeployment', key);
+                }
             }
         }
-        Logger(`Yippiee. 🤙 Validation finsihed without errors. Great 🤜🤛`,COLOR_HEADER);
+        Logger(`Yippiee. 🤙 Validaton finsihed without errors. Great 🤜🤛`,COLOR_HEADER);
         return {}
     }
 
@@ -432,7 +444,7 @@ First the dependecies packages. And then this package.`
             if (jobId) {
                 recordResult.push(jobId);
             } else {
-                throw new SfError(`Post Request to Queue runs on error`);
+                new SfError(`Post Request to Queue runs on error`);
             }
         } catch (e) {
             throw new SfError(`Insert to queue runs on error`);
@@ -548,5 +560,109 @@ First the dependecies packages. And then this package.`
             Logger(`This package contains testclass errors.`,COLOR_ERROR);
             throw new SfError(`Please fix this issues from the table and try again.`);
         }
+    }
+    private async validateSourcePackage(path: string, pck: string) {
+        Logger(`💪 Start Deployment and Tests for source package.`,COLOR_HEADER);
+        let username = this.org.getConnection().getUsername();
+        const sourceComps = await this.getApexClassesForSource(path);
+        const testLevel = sourceComps.apexTestclassNames.length > 0 ? 'RunSpecifiedTests' : 'NoTestRun';
+        Logger(`Validate source package: ${pck}`,COLOR_HEADER);
+        Logger(`${COLOR_NOTIFY('Path:')} ${COLOR_INFO(path)}`);
+        Logger(`${COLOR_NOTIFY('Metadata Size:')} ${COLOR_INFO(sourceComps.comps.length)}`);
+        Logger(`${COLOR_NOTIFY('TestLevel:')} ${COLOR_INFO(testLevel)}`);
+        Logger(`${COLOR_NOTIFY('Username:')} ${COLOR_INFO(username)}`);
+        Logger(
+            `${COLOR_NOTIFY('ApexClasses:')} ${
+                sourceComps.apexClassNames.length > 0
+                    ? COLOR_INFO(sourceComps.apexClassNames.join())
+                    : COLOR_INFO('no Apex Classes in source package')
+            }`
+        );
+        Logger(
+            `${COLOR_NOTIFY('ApexTestClasses:')} ${
+                sourceComps.apexTestclassNames.length > 0
+                    ? COLOR_INFO(sourceComps.apexTestclassNames.join())
+                    : COLOR_INFO('no Apex Test Classes in source package')
+            }`
+        );
+
+        if (sourceComps.apexClassNames.length > 0 && sourceComps.apexTestclassNames.length === 0) {
+            throw new SfError(
+                `Found apex class(es) for package ${pck} but no testclass(es). Please create a new testclass.`
+            );
+        }
+
+        const deploy: MetadataApiDeploy = await ComponentSet.fromSource(path).deploy({
+            usernameOrConnection: username,
+            apiOptions: { checkOnly: true, testLevel: testLevel, runTests: sourceComps.apexTestclassNames },
+        });
+        // Attach a listener to check the deploy status on each poll
+        let counter = 0;
+        deploy.onUpdate((response) => {
+            if (counter === 5) {
+                const {
+                    status,
+                    numberComponentsDeployed,
+                    numberComponentsTotal,
+                    numberTestsTotal,
+                    numberTestsCompleted,
+                    stateDetail,
+                } = response;
+                const progress = `${numberComponentsDeployed}/${numberComponentsTotal}`;
+                const testProgress = `${numberTestsCompleted}/${numberTestsTotal}`;
+                let message = '';
+                if (numberComponentsDeployed < sourceComps.comps.length) {
+                    message = `⌛ Deploy Package: ${pck} Status: ${status} Progress: ${progress}`;
+                } else if (numberComponentsDeployed === numberComponentsTotal && numberTestsTotal > 0) {
+                    message = `⌛ Test Package: ${pck} Status: ${status} Progress: ${testProgress} ${stateDetail ?? ''}`;
+                } else if (numberTestsTotal === 0 && sourceComps.apexTestclassNames.length > 0) {
+                    message = `⌛ Waiting for testclass execution`;
+                }
+                Logger(message,COLOR_TRACE);
+                counter = 0;
+            } else {
+                counter++;
+            }
+        });
+
+        // Wait for polling to finish and get the DeployResult object
+        const res = await deploy.pollStatus();
+        if (!res.response.success) {
+            await this.createOutput(res.response.details);
+        } else {
+            Logger(`✔ Deployment and tests for source package ${pck} successfully 👌`,COLOR_INFO);
+        }
+    }
+    private async getApexClassesForSource(path: string): Promise<SourcePackageComps> {
+        const sourcePckComps: SourcePackageComps = { comps: [], apexClassNames: [], apexTestclassNames: [] };
+        const resolver: MetadataResolver = new MetadataResolver();
+
+        for (const component of resolver.getComponentsFromPath(path)) {
+            sourcePckComps.comps.push(component.name);
+            if (component.type.id === 'apexclass') {
+                const apexCheckResult: ApexTestclassCheck = await this.checkIsSourceTestClass(component.content);
+                if (apexCheckResult.isTest) {
+                    sourcePckComps.apexTestclassNames.push(component.name);
+                } else {
+                    sourcePckComps.apexClassNames.push(component.name);
+                }
+            }
+        }
+
+        return sourcePckComps;
+    }
+    //check if apex class is a testclass from code identifier @isTest
+    private async checkIsSourceTestClass(comp: string): Promise<ApexTestclassCheck> {
+        let checkResult: ApexTestclassCheck = { isTest: false };
+        try {
+            const data = await fs.promises.readFile(comp, 'utf8');
+            if (data.search('@isTest') > -1 || data.search('@IsTest') > -1) {
+                checkResult.isTest = true;
+            }
+        } catch (err) {
+            Logger(err,COLOR_TRACE);
+            return checkResult;
+        }
+        return checkResult;
     }
     }

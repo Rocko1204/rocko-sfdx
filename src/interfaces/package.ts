@@ -46,3 +46,10 @@ export type ApexTestclassCheck = {
     Id?: string;
     isTest?: boolean;
 }
+
+export type SourcePackageComps = {
+    comps?: string[];
+    apexClassNames?: string[];
+    apexTestclassNames?: string[];
+}
+
